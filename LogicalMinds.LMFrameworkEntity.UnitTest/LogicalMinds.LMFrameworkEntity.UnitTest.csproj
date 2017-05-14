@@ -50,8 +50,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="JsonTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LogicalMinds.LMFrameworkEntity.Entity\LogicalMinds.LMFrameworkEntity.Entity.csproj">
+      <Project>{20543366-6df2-47f0-8591-c623d0db90e5}</Project>
+      <Name>LogicalMinds.LMFrameworkEntity.Entity</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

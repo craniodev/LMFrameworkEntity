@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -266,6 +268,241 @@ namespace LogicalMinds.LMFrameworkEntity.Entity
             }
             return retorno;
         }
+
+
+
+        public string toJson()
+        {
+            string json = string.Empty;
+            using (SqlConnection sqlConnection = new SqlConnection(_connectionString))
+            {
+                sqlCommand.Connection = sqlConnection;
+                sqlConnection.Open();
+                var dr = sqlCommand.ExecuteReader();
+                json = SerializeJson(dr);
+            }
+            return json;
+        }
+
+        protected string SerializeJson(SqlDataReader dr)
+        {
+            var retorno = new List<Dictionary<string, object>>();
+
+            var dic = new Dictionary<string, object>();
+            object ID = -1;
+
+            while (dr.Read())
+            {
+                dic = addToDic(dr, dic, 0, ref ID, string.Empty);
+                if (!retorno.Contains(dic))
+                    retorno.Add(dic);
+            }
+
+            return JsonConvert.SerializeObject(retorno);
+
+        }
+
+        //protected Dictionary<string, object> SerializeToDictionary(SqlDataReader dr)
+        //{
+
+        //    var d = new Dictionary<string, object>();
+
+        //    for (var i = 0; i < dr.FieldCount; i++)
+        //    {
+        //        object ID = null;
+        //        AddToDic(dr.GetName(i), dr[i], ref d, null, ID);
+
+        //        //d.Add(dr.GetName(i), dr[i]);
+        //    }
+
+
+
+        //    return d;
+
+        //}
+
+
+        //protected Dictionary<string, object> addToDic(SqlDataReader dr, Dictionary<string, object> d, int fieldIndex, ref object ID, string fieldNameList = "")
+        //{
+
+        //    Dictionary<string, object> dicToValue;
+
+        //    dicToValue = d;
+        //    if (ID != null && !String.IsNullOrEmpty(fieldNameList))
+        //    {
+        //        if (ID.ToString() != dr[fieldIndex].ToString())
+        //        {
+        //            var list = (List<Dictionary<string, object>>)d[fieldNameList];
+        //            list.Add(new Dictionary<string, object>());
+        //            dicToValue = list.First();
+        //        }
+        //        else
+        //        {
+        //            var list = (List<Dictionary<string, object>>)d[fieldNameList];
+        //            dicToValue = list.First();
+        //        }
+        //    }
+
+
+        //    for (var i = fieldIndex; i < dr.FieldCount; i++)
+        //    {
+
+        //        var f = dr.GetName(i);
+
+        //        if (!string.IsNullOrEmpty(fieldNameList))
+        //            f = Helper.RemoveFirst(dr.GetName(i), fieldNameList + '_');
+
+
+        //        if (f.IndexOf("_") != -1)
+        //        {
+        //            var fs = f.Split('_');
+
+        //            var list = new List<Dictionary<string, object>>();
+
+        //            if (!dicToValue.ContainsKey(fs.First()))
+        //                dicToValue.Add(fs.First(), list);
+
+        //            ID = dr[fieldIndex];
+
+        //            addToDic(dr, dicToValue, i, ref ID, fs.First());
+        //            return dicToValue;
+        //        }
+
+        //        if (!dicToValue.ContainsKey(dr.GetName(i)))
+        //            dicToValue.Add(dr.GetName(i), dr[i]);
+        //    }
+
+        //    return dicToValue;
+
+        //}
+
+
+
+        //protected void AddToDic(string fieldName, object value, ref Dictionary<string, object> d, string fieldNameParent = null, object ID = null)
+        //{
+
+        //    if (fieldName.IndexOf("_") == -1)
+        //    {
+        //        // simple
+        //        if (d.ContainsKey(fieldName)) return;
+        //        d.Add(fieldName, value);
+
+        //    }
+        //    else
+        //    {
+
+        //        // complex
+        //        var fieldNames = fieldName.Split('_');
+
+        //        Dictionary<string, object> dToValue = null;
+
+        //        // Create structure
+        //        for (var i = 0; i < fieldNames.Count(); i++)
+        //        {
+        //            if (i == fieldNames.Count() - 1)
+        //            {
+        //                // last
+        //                dToValue.Add(fieldNames[i], value);
+        //            }
+        //            else
+        //            {
+        //                // Add all property dic to dictonary
+        //                if (!d.ContainsKey(fieldNames[i]))
+        //                    d.Add(fieldNames[i], new Dictionary<string, object>());
+
+        //                dToValue = (Dictionary<string, object>)d[fieldNames[i]];
+        //            }
+
+        //        }
+
+        //    }
+
+        //}
+
+
+
+
+        protected Dictionary<string, object> addToDic(SqlDataReader dr, Dictionary<string, object> d, int fieldIndex, ref object ID, string fieldNameList = "", int fieldIndexID = 0)
+        {
+
+            Dictionary<string, object> dicToValue;
+
+            var IDNow = dr[fieldIndexID];
+
+            if (ID.Equals(IDNow))
+            {
+                dicToValue = d;
+            }
+            else
+            {
+                dicToValue = new Dictionary<string, object>();
+            }
+
+            ID = IDNow;
+
+            Dictionary<string, object> ret = null;
+            object retID;
+            for (var i = fieldIndex; i < dr.FieldCount; i++)
+            {
+
+                var f = dr.GetName(i);
+
+                if (!string.IsNullOrEmpty(fieldNameList))
+                    f = Helper.RemoveFirst(dr.GetName(i), fieldNameList + '_');
+
+                if (f.IndexOf("_") != -1)
+                {
+                    var fs = f.Split('_');
+                    var listFielsName = fs.First();
+
+                    List<Dictionary<string, object>> list;
+                    if (!dicToValue.ContainsKey(listFielsName))
+                    {
+                        list = new List<Dictionary<string, object>>();
+                        dicToValue.Add(listFielsName, list);
+
+
+                    }
+                    else
+                    {
+                        list = (List<Dictionary<string, object>>)dicToValue[listFielsName];
+                    }
+
+                    retID = IDNow;
+
+                    if (list.Any())
+                    {
+                        foreach (var item in list)
+                        {
+                            var retFieldName = Helper.UltimoField(dr.GetName(i));
+                            if (item.ContainsKey(retFieldName) && item[retFieldName].Equals(dr[i]))
+                            {
+                                ret = item;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (ret == null)
+                        ret = new Dictionary<string, object>();
+
+                    ret = addToDic(dr, ret, i, ref retID, listFielsName, fieldIndex);
+                    if (!list.Contains(ret))
+                        list.Add(ret);
+
+
+                    break;
+                }
+
+                if (!dicToValue.ContainsKey(Helper.UltimoField(dr.GetName(i))))
+                    dicToValue.Add(Helper.UltimoField(dr.GetName(i)), dr[i]);
+            }
+
+            return dicToValue;
+
+        }
+
+
     }
 
     internal class FieldEntityAttribute : Attribute
@@ -276,4 +513,49 @@ namespace LogicalMinds.LMFrameworkEntity.Entity
         public string PropertyID { get; set; }
         public string ParamName { get; set; }
     }
+
+    internal class MyBag : DynamicObject
+    {
+        private readonly Dictionary<string, dynamic> _properties = new Dictionary<string, dynamic>(StringComparer.InvariantCultureIgnoreCase);
+
+        public override bool TryGetMember(GetMemberBinder binder, out dynamic result)
+        {
+            result = this._properties.ContainsKey(binder.Name) ? this._properties[binder.Name] : null;
+
+            return true;
+        }
+
+        public override bool TrySetMember(SetMemberBinder binder, dynamic value)
+        {
+            if (value == null)
+            {
+                if (_properties.ContainsKey(binder.Name))
+                    _properties.Remove(binder.Name);
+            }
+            else
+                _properties[binder.Name] = value;
+
+            return true;
+        }
+    }
+
+
+    internal static class Helper
+    {
+
+        internal static string RemoveFirst(string str, string removeString)
+        {
+            return str.Remove(0, str.IndexOf(removeString) + removeString.Length);
+        }
+
+        internal static string UltimoField(string str)
+        {
+            return str.Remove(0, str.LastIndexOf("_") + 1);
+        }
+
+
+
+
+    }
+
 }
