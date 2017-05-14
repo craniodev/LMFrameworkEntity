@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogicalMinds.LMFrameworkEntity.Entity", "LogicalMinds.LMFrameworkEntity.Entity\LogicalMinds.LMFrameworkEntity.Entity.csproj", "{20543366-6DF2-47F0-8591-C623D0DB90E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogicalMinds.LMFrameworkEntity.UnitTest", "LogicalMinds.LMFrameworkEntity.UnitTest\LogicalMinds.LMFrameworkEntity.UnitTest.csproj", "{BE7C5961-232A-4795-9AB5-92D717F31366}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{20543366-6DF2-47F0-8591-C623D0DB90E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20543366-6DF2-47F0-8591-C623D0DB90E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20543366-6DF2-47F0-8591-C623D0DB90E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20543366-6DF2-47F0-8591-C623D0DB90E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE7C5961-232A-4795-9AB5-92D717F31366}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE7C5961-232A-4795-9AB5-92D717F31366}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE7C5961-232A-4795-9AB5-92D717F31366}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE7C5961-232A-4795-9AB5-92D717F31366}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
